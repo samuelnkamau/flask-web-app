@@ -167,6 +167,25 @@ def confirmation():
         "Phone": phone
     }), 200
 
+@app.route('/validation', methods=['POST'])
+def validation():
+    try:
+        # Get the incoming JSON payload
+        data = request.get_json(force=True)
+        print("Validation request received:", data)
+
+        # Respond with acceptance (ResultCode 0 means success)
+        return jsonify({
+            "ResultCode": 0,
+            "ResultDesc": "Accepted"
+        }), 200
+    except Exception as e:
+        print("Error in validation:", e)
+        return jsonify({
+            "ResultCode": 1,
+            "ResultDesc": "Failed"
+        }), 500
+    
 
 if __name__ == '__main__':
     #app.run(debug=True)
