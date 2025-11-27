@@ -4,98 +4,134 @@ from flask import Flask, request, jsonify
 import requests
 import json
 
+import os
+import csv
+from datetime import datetime
 
 app = Flask(__name__)
-DB_NAME = 'daraja.db'
+#define path for the file
+CSV_FILE="TokenRecord.csv"
 
-# Initialize the SQLite database
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS daraja_transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            transaction_type TEXT,
-            trans_id TEXT,
-            trans_time TEXT,
-            trans_amount REAL,
-            business_short_code TEXT,
-            bill_ref_number TEXT,
-            invoice_number TEXT,
-            org_account_balance TEXT,
-            third_party_trans_id TEXT,
-            msisdn TEXT,
-            first_name TEXT,
-            middle_name TEXT,
-            last_name TEXT,
-            received_at TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
 
-init_db()
+# Function to write data to CSV
+def write_to_csv(data, filename=CSV_FILE):
+    # Check if file exists to decide whether to write header
+    file_exists = os.path.isfile(filename)
+
+    with open(filename, mode='a', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=data.keys())
+
+        # Write header only if file is new
+        if not file_exists:
+            writer.writeheader()
+
+        # Write the row
+        writer.writerow(data)
+
+
+#header=["Timestamp","Meter ID","Phone","Amount"]
+
+
+#Data to append
+#timestamp = datetime.datetime.now().isoformat()
+
+#file_empty=not os.path.exists(file_name) or os.path.getsize(file_name) == 0
+
+#Append to csv file
+# with open(file_name, 'a+', newline='') as csvfile:
+#     writer = csv.writer(csvfile)
+#     if file_empty:
+#         writer.writerow(header)
+#         writer.writerow([timestamp])
+# print("Row appended to Token Record.csv")
+
+
+
+#
+# DB_NAME = 'daraja.db'
+#
+# # Initialize the SQLite database
+# def init_db():
+#     conn = sqlite3.connect(DB_NAME)
+#     cursor = conn.cursor()
+#     cursor.execute('''
+#         CREATE TABLE IF NOT EXISTS daraja_transactions (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             transaction_type TEXT,
+#             trans_id TEXT,
+#             trans_time TEXT,
+#             trans_amount REAL,
+#             business_short_code TEXT,
+#             bill_ref_number TEXT,
+#             invoice_number TEXT,
+#             org_account_balance TEXT,
+#             third_party_trans_id TEXT,
+#             msisdn TEXT,
+#             first_name TEXT,
+#             middle_name TEXT,
+#             last_name TEXT,
+#             received_at TEXT
+#         )
+#     ''')
+#     conn.commit()
+#     conn.close()
+#
+# init_db()
 
 @app.route('/confirmation', methods=['POST'])
 def confirmation():
     # Get JSON payload from Daraja
-    data = request.get_json()
-    received_at = datetime.datetime.now().isoformat()
+    data1 = request.get_json()
+    received_at = datetime.now().isoformat()
 
     # Log or process the incoming data
-    print("Received confirmation:", data)
+    print("Received confirmation:", data1)
 
     # Example: Extract key fields (customize based on Daraja payload)
-    trans_type = data.get('TransactionType')
-    trans_id = data.get('TransID')
-    trans_time = data.get('TransTime')
+    trans_type = data1.get('TransactionType')
+    trans_id = data1.get('TransID')
+    trans_time = data1.get('TransTime')
 
-    trans_amount = data.get('TransAmount')
-    business_short_code = data.get('BusinessShortCode')
-    bill_ref_number = data.get('BillRefNumber')
-    invoice_number = data.get('InvoiceNumber')
-    org_account_balance = data.get('OrgAccountBalance')
-    third_party_trans_id = data.get('ThirdPartyTransID')
+    trans_amount = data1.get('TransAmount')
+    business_short_code = data1.get('BusinessShortCode')
+    bill_ref_number = data1.get('BillRefNumber')
+    invoice_number = data1.get('InvoiceNumber')
+    org_account_balance = data1.get('OrgAccountBalance')
+    third_party_trans_id = data1.get('ThirdPartyTransID')
 
-    phone = data.get('MSISDN')
-    first_name = data.get('FirstName')
-    middle_name = data.get('MiddleName')
-    last_name = data.get('LastName')
+    phone = data1.get('MSISDN')
+    first_name = data1.get('FirstName')
+    middle_name = data1.get('MiddleName')
+    last_name = data1.get('LastName')
     # Convert metadata list to dictionary
     # meta_dict = {item['Name']: item.get('Value') for item in metadata}
 
-    # Save to SQLite
 
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO daraja_transactions (
-            transaction_type, trans_id, trans_time, trans_amount,
-            business_short_code, bill_ref_number, invoice_number,
-            org_account_balance, third_party_trans_id, msisdn,
-            first_name, middle_name, last_name, received_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        trans_type, trans_id, trans_time, trans_amount,
-        business_short_code, bill_ref_number, invoice_number,
-        org_account_balance, third_party_trans_id, phone,
-        first_name, middle_name, last_name, received_at
 
-    ))
-    conn.commit()
-    conn.close()
+
 
     # API endpoint for vending tokens
-    url = "http://www.server-newa.stronpower.com/api/VendingMeterDirectly"
+    #url = "http://www.server-newa.stronpower.com/api/VendingMeterDirectly"
+    url="http://www.server-newa.stronpower.com/api/VendingMeter"
 
     # Replace with your actual credentials and meter details
     payload = {
         "CompanyName": "Samuel",
         "UserName": "Samuel",
         "PassWord": "Samuel123",
-        "MeterId": invoice_number,
-        "Amount": trans_amount  # Amount to vend
+        "MeterID":invoice_number,
+        "is_vend_by_unit": "true ",
+        "Amount": trans_amount
     }
+
+    #}
+    # payload = {
+    #     "CompanyName": "Samuel",
+    #     "UserName": "Samuel",
+    #     "PassWord": "Samuel123",
+    #     "MeterId": invoice_number,
+    #     "Amount": trans_amount  # Amount to vend
+    # }
 
     # Send the POST request
     response = requests.post(url, json=payload)
@@ -108,6 +144,8 @@ def confirmation():
     if response.status_code == 200:
         print("✅ Token Vended Successfully!")
         token_info = response.json()[0]
+        print("Customer_name:", token_info['Customer_name'])
+        print("Customer_Phone", token_info['Customer_phone'])
         print("Meter ID:", token_info['Meter_id'])
         print("Meter Type:", token_info['Meter_type'])
         print("Token:", token_info['Token'])
@@ -117,14 +155,14 @@ def confirmation():
         print("Response:", response.text)
 
     token_string = "Meter ID: " + token_info['Meter_id'] + "\n" + "Token: " + token_info['Token'] + "\n" + "Date: " + \
-                   token_info['Gen_time']
+                   token_info['Gen_time']+"\n"+token_info['Customer_name']+"\n"+trans_time
 
     # Share the Token as an SMS
     # Replace with your actual credentials
     api_key = '84ecb8bdba9bfbe45d505256dd493884'
     partner_id = '14970'
     shortcode = 'TextSMS'  # e.g., your company name or shortcode
-    recipient = phone  # Kenyan mobile number
+    recipient = token_info['Customer_phone'] #phone  # Kenyan mobile number
     message = token_string
 
     # Prepare the payload
@@ -145,29 +183,34 @@ def confirmation():
     # Print the response
     print("Status Code:", response.status_code)
     print("Response:", response.json())
-    data = response.json()
-    description = data['responses'][0]['response-description']
-    mobile = data['responses'][0]['mobile']
-    messageid = data['responses'][0]['messageid']
+    data2 = response.json()
+    description = data2['responses'][0]['response-description']
+    mobile = data2['responses'][0]['mobile']
+    messageid = data2['responses'][0]['messageid']
     print("Description:", description)
     print("Mobile:", mobile)
     print("Message ID", messageid)
+    try:
+        write_to_csv(data1)
+        return jsonify({"message": "Data written to CSV successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        #
+        # # Respond with a success message
+        # return (jsonify({
+        #     "ResultCode": 0,
+        #     "ResultDesc": "Confirmation received successfully",
+        #     "TransactionID": trans_id,
+        #     "Amount": trans_amount,
+        #     "Phone": phone
+        #     }), 200
 
 
-
-
-
-
-    # Respond with a success message
-    return jsonify({
-        "ResultCode": 0,
-        "ResultDesc": "Confirmation received successfully",
-        "TransactionID": trans_id,
-        "Amount": trans_amount,
-        "Phone": phone
-    }), 200
 
 @app.route('/validation', methods=['POST'])
+
+
 def validation():
     try:
         # Get the incoming JSON payload
@@ -179,12 +222,34 @@ def validation():
             "ResultCode": 0,
             "ResultDesc": "Accepted"
         }), 200
+
     except Exception as e:
         print("Error in validation:", e)
         return jsonify({
             "ResultCode": 1,
             "ResultDesc": "Failed"
         }), 500
+
+#
+#
+#
+# def validation():
+#     try:
+#         # Get the incoming JSON payload
+#         data = request.get_json(force=True)
+#         print("Validation request received:", data)
+#
+#         # Respond with acceptance (ResultCode 0 means success)
+#         # return jsonify({
+#         #     "ResultCode": 0,
+#         #     "ResultDesc": "Accepted"
+#         # }), 200
+#     except Exception as e:
+#         print("Error in validation:", e)
+#         return jsonify({
+#             "ResultCode": 1,
+#             "ResultDesc": "Failed"
+#         }), 500
     
 
 if __name__ == '__main__':
