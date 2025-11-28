@@ -124,7 +124,7 @@ def confirmation():
         print("Response:", response.text)
 
     token_string = "Meter ID: " + token_info['Meter_id'] + "\n" + "Token: " + token_info['Token'] + "\n" + "Date: " + \
-                   token_info['Gen_time']+"\n"+token_info['Customer_name']+"\n"+trans_time
+                   token_info['Gen_time']+"\n"+token_info['Customer_name']
 
     # Share the Token as an SMS
     # Replace with your actual credentials
