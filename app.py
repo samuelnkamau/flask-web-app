@@ -50,7 +50,8 @@ def write_to_csv(data, filename=CSV_FILE):
 def confirmation():
     # Get JSON payload from Daraja
     data1 = request.get_json()
-    received_at = datetime.now().isoformat()
+    #received_at = datetime.now().isoformat()
+    received_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Log or process the incoming data
     print("Received confirmation:", data1)
