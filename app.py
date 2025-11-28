@@ -59,14 +59,14 @@ def confirmation():
     # Example: Extract key fields (customize based on Daraja payload)
     trans_type = data1.get('TransactionType')
     trans_id = data1.get('TransID')
-    trans_time = data1.get('TransTime')
+    #trans_time = data1.get('TransTime')
 
     trans_amount = data1.get('TransAmount')
     business_short_code = data1.get('BusinessShortCode')
     bill_ref_number = data1.get('BillRefNumber')
-    invoice_number = data1.get('InvoiceNumber')
-    org_account_balance = data1.get('OrgAccountBalance')
-    third_party_trans_id = data1.get('ThirdPartyTransID')
+    #invoice_number = data1.get('InvoiceNumber')
+    #org_account_balance = data1.get('OrgAccountBalance')
+    #third_party_trans_id = data1.get('ThirdPartyTransID')
 
     phone = data1.get('MSISDN')
     first_name = data1.get('FirstName')
