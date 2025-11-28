@@ -1,4 +1,3 @@
-import sqlite3
 import datetime
 from flask import Flask, request, jsonify
 import requests
@@ -124,7 +123,7 @@ def confirmation():
         print("Response:", response.text)
 
     token_string = "Meter ID: " + token_info['Meter_id'] + "\n" + "Token: " + token_info['Token'] + "\n" + "Date: " + \
-                   token_info['Gen_time']+"\n"+token_info['Customer_id']
+                   token_info['Gen_time']+"\n"+token_info['Customer_id']+"\n"+str(received_at)
 
     # Share the Token as an SMS
     # Replace with your actual credentials
