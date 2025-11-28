@@ -47,37 +47,6 @@ def write_to_csv(data, filename=CSV_FILE):
 
 
 
-#
-# DB_NAME = 'daraja.db'
-#
-# # Initialize the SQLite database
-# def init_db():
-#     conn = sqlite3.connect(DB_NAME)
-#     cursor = conn.cursor()
-#     cursor.execute('''
-#         CREATE TABLE IF NOT EXISTS daraja_transactions (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             transaction_type TEXT,
-#             trans_id TEXT,
-#             trans_time TEXT,
-#             trans_amount REAL,
-#             business_short_code TEXT,
-#             bill_ref_number TEXT,
-#             invoice_number TEXT,
-#             org_account_balance TEXT,
-#             third_party_trans_id TEXT,
-#             msisdn TEXT,
-#             first_name TEXT,
-#             middle_name TEXT,
-#             last_name TEXT,
-#             received_at TEXT
-#         )
-#     ''')
-#     conn.commit()
-#     conn.close()
-#
-# init_db()
-
 @app.route('/confirmation', methods=['POST'])
 def confirmation():
     # Get JSON payload from Daraja
@@ -119,9 +88,9 @@ def confirmation():
         "CompanyName": "Samuel",
         "UserName": "Samuel",
         "PassWord": "Samuel123",
-        "MeterID":invoice_number,
+        "MeterID":bill_ref_number,
         "is_vend_by_unit": "true ",
-        "Amount": trans_amount
+        "Amount":trans_amount
     }
 
     #}
