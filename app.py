@@ -174,7 +174,7 @@ def confirmation():
         #     "Amount": trans_amount,
         #     "Phone": phone
         #     }), 200
-    return "Confirmation successful", 200  # Explicit HTTP 200 OK
+    return jsonify({"ResultCode":0,"ResultDesc":"Accepted"}), 200  # Explicit HTTP 200 OK
 
 
 @app.route('/validation', methods=['POST'])
