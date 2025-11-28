@@ -131,7 +131,7 @@ def confirmation():
     api_key = '84ecb8bdba9bfbe45d505256dd493884'
     partner_id = '14970'
     shortcode = 'TextSMS'  # e.g., your company name or shortcode
-    recipient = token_info['Customer_phone'] #phone  # Kenyan mobile number
+    recipient = token_info['Customer_phone'] #phone Kenyan mobile number
     message = token_string
 
     # Prepare the payload
