@@ -46,7 +46,7 @@ def write_to_csv(data, filename=CSV_FILE):
 
 
 
-@app.post('/confirmation', methods=['POST'])
+@app.route('/confirmation', methods=['POST'])
 def confirmation():
     # Get JSON payload from Daraja
     data1 = request.get_json()
@@ -176,7 +176,7 @@ def confirmation():
     return jsonify({"ResultCode":0,"ResultDesc":"Accepted"}), 200  # Explicit HTTP 200 OK
 
 
-@app.post('/validation', methods=['POST'])
+@app.route('/validation', methods=['POST'])
 
 
 def validation():
