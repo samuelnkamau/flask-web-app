@@ -160,7 +160,8 @@ def confirmation():
     print("Message ID", messageid)
     try:
         write_to_csv(data1)
-        return jsonify({"message": "Data written to CSV successfully"}), 200
+        return jsonify({"ResultCode":0,"ResultDesc":"Accepted"}), 200 
+        #return jsonify({"message": "Data written to CSV successfully"}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -173,7 +174,7 @@ def confirmation():
         #     "Amount": trans_amount,
         #     "Phone": phone
         #     }), 200
-    return jsonify({"ResultCode":0,"ResultDesc":"Accepted"}), 200  # Explicit HTTP 200 OK
+    #return jsonify({"ResultCode":0,"ResultDesc":"Accepted"}), 200  # Explicit HTTP 200 OK
 
 
 @app.route('/validation', methods=['POST'])
