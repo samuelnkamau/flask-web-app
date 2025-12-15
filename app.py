@@ -2,7 +2,7 @@ import datetime
 from flask import Flask, request, jsonify
 import requests
 import json
-
+import re
 import os
 import csv
 from datetime import datetime
