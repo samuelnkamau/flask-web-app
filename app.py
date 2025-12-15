@@ -89,7 +89,7 @@ def confirmation():
         "UserName": "Samuel",
         "PassWord": "Samuel123",
         "MeterID":bill_ref_number,
-        "is_vend_by_unit": "true ",
+        "is_vend_by_unit": "false",
         "Amount":trans_amount
     }
 
