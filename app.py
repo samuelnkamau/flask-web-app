@@ -6,10 +6,31 @@ import json
 import os
 import csv
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 #define path for the file
 CSV_FILE="TokenRecord.csv"
+
+# ── Registered meter numbers (seed for demo). Replace with your source of truth.
+REGISTERED_METERS = {
+    "58000046621": {"status": "active"},
+    "58000045987": {"status": "active"},
+    "58000046654": {"status": "inactive"},
+    "58000046613": {"status": "active"},
+    "58000046209": {"status": "active"},
+    "58000045979": {"status": "active"},# allow numeric-only references too
+}
+
+# Optional: normalize function to keep formats consistent
+def normalize_bill_ref(bill_ref: str) -> str:
+    if not bill_ref:
+        return ""
+    bill_ref = bill_ref.strip().upper() # Removes any leading and trailing whitespace characters (spaces, tabs, newlines) from the string
+    #and Converts all alphabetic characters in the string to uppercase
+    # Example normalization: collapse multiple spaces, ensure prefix when needed, etc.
+    bill_ref = re.sub(r"\s+", "-", bill_ref)
+    return bill_ref
 
 
 # Function to write data to CSV
@@ -51,7 +72,8 @@ def confirmation():
     # Get JSON payload from Daraja
     data1 = request.get_json()
     #received_at = datetime.now().isoformat()
-    received_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    dt = datetime.now(ZoneInfo("Africa/Nairobi"))
+    received_at=dt.strftime("%Y-%m-%d %H:%M:%S")
 
     # Log or process the incoming data
     print("Received confirmation:", data1)
@@ -89,7 +111,7 @@ def confirmation():
         "UserName": "Samuel",
         "PassWord": "Samuel123",
         "MeterID":bill_ref_number,
-        "is_vend_by_unit": "true ",
+        "is_vend_by_unit": "false",
         "Amount":trans_amount
     }
 
@@ -123,7 +145,7 @@ def confirmation():
         print("❌ Failed to vend token. Status Code:", response.status_code)
         print("Response:", response.text)
 
-    token_string = "Meter ID: " + token_info['Meter_id'] + "\n" + "Token: " + token_info['Token'] + "\n" + "House No: "+token_info['Customer_id']+"\n"+"Date & Time: "+str(received_at)+"\n"+"Amount :"+token_info['Total_unit']
+    token_string = "Meter ID: " + token_info['Meter_id'] + "\n" + "Token: " + token_info['Token'] + "\n" + "House No: "+token_info['Customer_id']+"\n"+"Date & Time: "+str(received_at)+"\n"+"Units :"+token_info['Total_unit']+"\n"+"Amount :"+token_info['Total_paid']
 
     # Share the Token as an SMS
     # Replace with your actual credentials
@@ -182,43 +204,24 @@ def confirmation():
 
 def validation():
     try:
-        # Get the incoming JSON payload
-        data = request.get_json(force=True)
-        print("Validation request received:", data)
+        data1= request.get_json(force=True, silent=False) or {}
+    except Exception:
+        return jsonify({"ResultCode": 1, "ResultDesc": "Rejected: invalid JSON"}), 200
+    bill_ref = normalize_bill_ref(data1.get("BillRefNumber", ""))
+    amount = data1.get("TransAmount") or data1.get("Amount")
+    msisdn = data1.get("MSISDN") or data1.get("Msisdn")
+# Basic validations
+    if not bill_ref:
+        return jsonify({"ResultCode": 1, "ResultDesc": "Rejected: missing BillRefNumber"}), 200
+    # Check meter exists
+    meter = REGISTERED_METERS.get(bill_ref)
+    if meter is None:
+        return jsonify({"ResultCode": 1, "ResultDesc": f"Rejected: unknown meter {bill_ref}"}), 200
+    # Optional: ensure meter is active
+    if meter.get("status") != "active":
+        return jsonify({"ResultCode": 1, "ResultDesc": f"Rejected: meter {bill_ref} inactive"}), 200
 
-        # Respond with acceptance (ResultCode 0 means success)
-        return jsonify({
-            "ResultCode": 0,
-            "ResultDesc": "Accepted"
-        }), 200
 
-    except Exception as e:
-        print("Error in validation:", e)
-        return jsonify({
-            "ResultCode": 1,
-            "ResultDesc": "Failed"
-        }), 500
-
-#
-#
-#
-# def validation():
-#     try:
-#         # Get the incoming JSON payload
-#         data = request.get_json(force=True)
-#         print("Validation request received:", data)
-#
-#         # Respond with acceptance (ResultCode 0 means success)
-#         # return jsonify({
-#         #     "ResultCode": 0,
-#         #     "ResultDesc": "Accepted"
-#         # }), 200
-#     except Exception as e:
-#         print("Error in validation:", e)
-#         return jsonify({
-#             "ResultCode": 1,
-#             "ResultDesc": "Failed"
-#         }), 500
     
 
 if __name__ == '__main__':
